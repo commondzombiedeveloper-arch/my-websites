@@ -16,38 +16,49 @@
     <table id="tabel-harga">
         <thead>
             <tr>
-                <th>Kode</th>
+                <th>Produk</th>
                 <th>Harga</th>
             </tr>
         </thead>
         <tbody id="isi-tabel">
-            <tr><td colspan="2">Sedang mengambil data...</td></tr>
+            <tr><td colspan="2">Sedang mengambil data... (Tunggu sebentar)</td></tr>
         </tbody>
     </table>
 
     <script>
-        // PASTE LINK CSV DARI GOOGLE SHEETS DI SINI
+        // GANTI LINK DI BAWAH INI DENGAN LINK CSV GOOGLE SHEETS ANDA
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNIhuEN5Pa5AqS_ah7dRk38VWzvxFLBYGwd3yIg2dchojhM1ihGyB5u0UkxyRgDBfoDFimPUmnt3df/pub?output=csv";
 
         Papa.parse(csvUrl, {
             download: true,
-            header: true, // Menganggap baris pertama di Excel adalah judul kolom (Produk, Harga)
+            header: true,
             complete: function(results) {
+                // Baris ini untuk mengecek apakah data berhasil diambil (lihat di Inspect Element > Console)
+                console.log("Data berhasil diambil:", results.data);
+
                 let data = results.data;
                 let htmlIsi = "";
 
-                // Melakukan pengulangan untuk setiap baris di Excel
                 data.forEach(row => {
-                    // Pastikan nama row.Produk dan row.Harga sesuai dengan header di Excel Anda
-                    if(row.Kode && row.Harga) {
+                    // Cek nama kolom. Sesuaikan "Produk" dan "Harga" dengan nama kolom di Excel Anda!
+                    if(row.Produk && row.Harga) {
                         htmlIsi += `<tr>
-                                        <td>${row.Kode}</td>
+                                        <td>${row.Produk}</td>
                                         <td>${row.Harga}</td>
                                     </tr>`;
                     }
                 });
 
-                document.getElementById("isi-tabel").innerHTML = htmlIsi;
+                // Jika berhasil tapi kosong (mungkin karena nama kolom beda)
+                if(htmlIsi === "") {
+                    document.getElementById("isi-tabel").innerHTML = "<tr><td colspan='2' style='color:red;'>Data terhubung, tapi nama kolom (Header) tidak cocok dengan script.</td></tr>";
+                } else {
+                    document.getElementById("isi-tabel").innerHTML = htmlIsi;
+                }
+            },
+            error: function(err) {
+                console.error("Gagal mengambil data:", err);
+                document.getElementById("isi-tabel").innerHTML = "<tr><td colspan='2' style='color:red;'>Gagal mengambil data. Pastikan link CSV benar.</td></tr>";
             }
         });
     </script>
