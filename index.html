@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Harga Live dari Google Sheets</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        table { border-collapse: collapse; width: 100%; max-width: 600px; margin-top: 20px;}
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+    <h2>Daftar Harga Update Otomatis</h2>
+    <table id="tabel-harga">
+        <thead>
+            <tr>
+                <th>Kode</th>
+                <th>Harga</th>
+            </tr>
+        </thead>
+        <tbody id="isi-tabel">
+            <tr><td colspan="2">Sedang mengambil data...</td></tr>
+        </tbody>
+    </table>
+
+    <script>
+        // PASTE LINK CSV DARI GOOGLE SHEETS DI SINI
+        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNIhuEN5Pa5AqS_ah7dRk38VWzvxFLBYGwd3yIg2dchojhM1ihGyB5u0UkxyRgDBfoDFimPUmnt3df/pub?output=csv";
+
+        Papa.parse(csvUrl, {
+            download: true,
+            header: true, // Menganggap baris pertama di Excel adalah judul kolom (Produk, Harga)
+            complete: function(results) {
+                let data = results.data;
+                let htmlIsi = "";
+
+                // Melakukan pengulangan untuk setiap baris di Excel
+                data.forEach(row => {
+                    // Pastikan nama row.Produk dan row.Harga sesuai dengan header di Excel Anda
+                    if(row.Produk && row.Harga) {
+                        htmlIsi += `<tr>
+                                        <td>${row.Produk}</td>
+                                        <td>${row.Harga}</td>
+                                    </tr>`;
+                    }
+                });
+
+                document.getElementById("isi-tabel").innerHTML = htmlIsi;
+            }
+        });
+    </script>
+
+</body>
+</html>
